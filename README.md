@@ -18,8 +18,7 @@ The system check works on both sides of the handoff, in parallel. The code audit
 runs on every pull request and names the token you probably meant. The Figma check
 runs every night on the design file and leaves a summary for the morning. The same
 nightly run picks up any token changed in Figma and opens a pull request for it, so
-a design change reaches the code through review, and merged token changes are
-pushed back to the Figma variables. Code and Figma share one set of tokens, joined
+a design change reaches the code through review. Code and Figma share one set of tokens, joined
 by their CSS names.
 
 The Figma side also looks across pages. One team detaching a component is a slip.
