@@ -1,0 +1,9 @@
+{
+  "tokens": "src/styles/tokens.css",
+  "scan": ["src"],
+  "extensions": ["css", "jsx", "tsx", "js", "ts"],
+  "baseline": "design-audit-baseline.json",
+  "grid": 4,
+  "strengths": { "--ink": [4, 8, 15, 28, 45], "--white": [50, 80] },
+  "secondary": "src/(admin|dev)/|Gallery\\.jsx$"
+}
