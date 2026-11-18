@@ -12,16 +12,32 @@ help if people use them, and in practice they drift: a hex typed by eye, a shado
 with its own rgba, a padding nudged to 10px. None of it is wrong on its own, and no
 reviewer catches all of it.
 
-So I made the system check itself, on both sides of the handoff, in parallel. The
-code audit runs on every pull request and names the token you probably meant. The
-Figma check runs every night on the design file and leaves a summary for the
-morning.
+## How it works
+
+The system check works on both sides of the handoff, in parallel. The code audit
+runs on every pull request and names the token you probably meant. The Figma check
+runs every night on the design file and leaves a summary for the morning. The same
+nightly run picks up any token changed in Figma and opens a pull request for it, so
+a design change reaches the code through review, and merged token changes are
+pushed back to the Figma variables. Code and Figma share one set of tokens, joined
+by their CSS names.
 
 The Figma side also looks across pages. One team detaching a component is a slip.
 When the same component gets detached by several teams, or the same off-system
 color or unstyled text size keeps coming back, that's a signal: the component is
 missing a variant, or the system is missing a token or a text style. The check
 flags those patterns as questions for the design system, not as errors.
+
+The production pages in Figma are never drawn by hand. A script captures every
+screen from the running app, desktop and mobile, and rebuilds it on the Figma
+canvas: every color bound to its variable, every text layer on a library text
+style, images and icons reused from the file, and layer names that match the CSS
+classes so a designer can find the code behind them. Each frame carries a build
+stamp with the commit, branch and date, so the file always shows what shipped.
+Anything that doesn't match a style is drawn raw, and the Figma check flags it.
+
+The token sync and the screen pipeline belong to the original project and aren't
+included here.
 
 When I turned the audit on, the app already had problems in it. If the check had
 failed every pull request until all of them were fixed, it would have blocked
