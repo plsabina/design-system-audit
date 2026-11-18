@@ -1,6 +1,6 @@
 # design-system-audit
 
-Two checks that catch styling which has drifted away from a design token system:
+Checks that catch styling which has drifted away from a design token system:
 one for code, one for Figma. They started life in a production design system
 and were pulled out here so they can be dropped into any project.
 
@@ -12,9 +12,16 @@ help if people use them, and in practice they drift: a hex typed by eye, a shado
 with its own rgba, a padding nudged to 10px. None of it is wrong on its own, and no
 reviewer catches all of it.
 
-So I made the system check itself. The code audit runs on every pull request and
-names the token you probably meant. The Figma script does the same for the design
-file, so drift gets caught on both sides of the handoff.
+So I made the system check itself, on both sides of the handoff, in parallel. The
+code audit runs on every pull request and names the token you probably meant. The
+Figma check runs every night on the design file and leaves a summary for the
+morning.
+
+The Figma side also looks across pages. One team detaching a component is a slip.
+When the same component gets detached by several teams, or the same off-system
+color or unstyled text size keeps coming back, that's a signal: the component is
+missing a variant, or the system is missing a token or a text style. The check
+flags those patterns as questions for the design system, not as errors.
 
 When I turned the audit on, the app already had problems in it. If the check had
 failed every pull request until all of them were fixed, it would have blocked
@@ -83,9 +90,10 @@ On GitHub Actions each new violation becomes an annotation on that line of the P
 - run: node audit.mjs
 ```
 
-## Figma: `figma/audit.plugin.js`
+## Figma: `figma/`
 
-A read-only Figma Plugin API script, the design-side twin. On one page it lists:
+`audit.plugin.js` is a read-only Figma Plugin API script, the design-side twin. On
+one page it lists:
 
 | Kind | What it catches |
 | --- | --- |
@@ -104,3 +112,22 @@ Set `PAGE` at the top (or leave it empty for the current page), `LOCAL_FONTS` fo
 fonts designers have locally that Figma can't load, and `EXEMPT` for layers whose
 colors are content rather than tokens. Then run it through an agent's `use_figma`
 tool, or paste it into a development plugin wrapped in an async function.
+
+### Repeated across pages: `repeats.mjs`
+
+Run the audit on several pages, ideally one per team or product area, then:
+
+```
+node figma/repeats.mjs team-a.json team-b.json team-c.json   # --min 3 to raise the bar
+```
+
+It lists every deviation that turns up on two or more pages: the same component
+detached, the same off-system color, the same unstyled text size, the same style
+override. Each comes with what it might mean, such as "this might suggest it needs
+a new variant or property".
+
+### Every night
+
+`nightly-routine.md` is a prompt for a scheduled Claude agent with the Figma
+connector. It runs the audit on each page, then `repeats.mjs`, and leaves a short
+summary to read in the morning. It only reads the file.

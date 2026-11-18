@@ -116,8 +116,12 @@ for (const n of page.findAll(() => true)) {
 
   if ("detachedInfo" in n && n.detachedInfo) {
     let from = null
-    if (n.detachedInfo.type === "local")
-      from = (await figma.getNodeByIdAsync(n.detachedInfo.componentId))?.name ?? null
+    if (n.detachedInfo.type === "local") {
+      // Name the component set rather than one variant, so the same component detached
+      // in two places counts as the same thing.
+      const comp = await figma.getNodeByIdAsync(n.detachedInfo.componentId)
+      from = (comp?.parent?.type === "COMPONENT_SET" ? comp.parent.name : comp?.name) ?? null
+    }
     add(n, "detached", { from, library: n.detachedInfo.type === "library" })
   }
   if (n.type === "INSTANCE") {
@@ -136,7 +140,11 @@ for (const n of page.findAll(() => true)) {
   if (n.type === "TEXT" && (!inInstance || fields?.has("textStyleId") || fields?.has("fontSize"))) {
     const sid = n.textStyleId
     if (!sid || sid === figma.mixed) {
-      add(n, "no-text-style", { text: n.characters.slice(0, 40), mixed: sid === figma.mixed })
+      add(n, "no-text-style", {
+        text: n.characters.slice(0, 40),
+        mixed: sid === figma.mixed,
+        fontSize: n.fontSize === figma.mixed ? "mixed" : n.fontSize
+      })
       continue
     }
     const s = await styleOf(sid)
