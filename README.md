@@ -4,6 +4,27 @@ Two checks that catch styling which has drifted away from a design token system:
 one for code, one for Figma. They started life in a production design system
 and were pulled out here so they can be dropped into any project.
 
+## Why I built this
+
+I built these for a product I was designing and building, where the design system
+was the part I most wanted to keep honest. Tokens in Figma and tokens in code only
+help if people use them, and in practice they drift: a hex typed by eye, a shadow
+with its own rgba, a padding nudged to 10px. None of it is wrong on its own, and no
+reviewer catches all of it.
+
+So I made the system check itself. The code audit runs on every pull request and
+names the token you probably meant. The Figma script does the same for the design
+file, so drift gets caught on both sides of the handoff.
+
+The part I'm proudest of is the baseline. When I turned the audit on, the app
+already had debt, and blocking every pull request until all of it was fixed would
+have just got the check switched off. Instead it freezes what's there and only
+fails on new problems, so the count can only go down. Eight days after it landed,
+the app had no raw colors left.
+
+Exceptions are allowed, but you have to write down why, on the line itself. That
+turns a quiet workaround into a decision someone can read in review.
+
 ## Code: `audit.mjs`
 
 A single Node script, no dependencies. It scans your source for:
