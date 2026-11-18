@@ -16,11 +16,11 @@ So I made the system check itself. The code audit runs on every pull request and
 names the token you probably meant. The Figma script does the same for the design
 file, so drift gets caught on both sides of the handoff.
 
-The part I'm proudest of is the baseline. When I turned the audit on, the app
-already had debt, and blocking every pull request until all of it was fixed would
-have just got the check switched off. Instead it freezes what's there and only
-fails on new problems, so the count can only go down. Eight days after it landed,
-the app had no raw colors left.
+When I turned the audit on, the app already had problems in it. If the check had
+failed every pull request until all of them were fixed, it would have blocked
+everyone's work on day one. So it starts from a baseline: it records what's
+already there and only fails on new problems, so the count can only go down.
+Eight days after it landed, the app had no raw colors left.
 
 Exceptions are allowed, but you have to write down why, on the line itself. That
 turns a quiet workaround into a decision someone can read in review.
